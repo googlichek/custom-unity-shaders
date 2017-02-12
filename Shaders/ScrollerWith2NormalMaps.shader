@@ -1,5 +1,6 @@
 ﻿Shader "Custom/ScrollerWith2NormalMaps"
 {
+	// Shader for fluid surfaces (such as water)
 	Properties{
 		_MainTint("Diffusive Tint", Color) = (1, 1, 1, 1)
 		_MainTex("Base (RGB)", 2D) = "white" {}

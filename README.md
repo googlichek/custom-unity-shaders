@@ -1,2 +1,2 @@
 # custom-unity-shaders
-Self-written Unity shaders
+Self-written Unity shaders.

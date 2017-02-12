@@ -56,7 +56,7 @@
 			o.Alpha = c.a;
 			o.Normal = normalTex.rgb;
         }
-	    ENDCG
+        ENDCG
     }
     FallBack "Diffuse"
 }

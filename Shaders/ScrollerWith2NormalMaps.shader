@@ -55,8 +55,8 @@
 			o.Albedo = c.rgb * _MainTint;
 			o.Alpha = c.a;
 			o.Normal = normalTex.rgb;
-	    }
+        }
 	    ENDCG
-	}            
+    }
     FallBack "Diffuse"
 }

@@ -1,6 +1,7 @@
-﻿Shader "Custom/2SWaterShader" 
+Shader "Custom/2SWaterShader" 
 {
 	// 2D water shader.
+	// Written in Unity 5.5.1
 	Properties 
 	{
 		_NoiseTex("Noise text", 2D) = "white" {}

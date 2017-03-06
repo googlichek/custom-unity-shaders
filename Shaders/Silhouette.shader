@@ -1,6 +1,7 @@
 ﻿Shader "Custom/Silhouette"
 {
 	// Holographic shader
+	// Written in Unity 5.5.1
 	Properties
 	{
 		_Color ("Color", Color) = (1,1,1,1)

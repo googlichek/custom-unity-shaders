@@ -1,6 +1,7 @@
-﻿Shader "Custom/VolumetricExplosion"
+Shader "Custom/VolumetricExplosion"
 {
 	// Volumetric explosion shader that requires gradient ramp and noise map.
+	// Written in Unity 5.5.1
 	Properties
 	{
 		_RampTex("Color Ramp", 2D) = "white" {}

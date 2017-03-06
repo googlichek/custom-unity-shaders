@@ -1,6 +1,7 @@
-﻿Shader "Custom/ToonShader"
+Shader "Custom/ToonShader"
 {
 	// Simple cel shader.
+	// Written in Unity 5.5.1
 	Properties
 	{
 		_MainTex("Texture", 2D) = "white" {}

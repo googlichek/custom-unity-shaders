@@ -1,6 +1,7 @@
-﻿Shader "Custom/VertexSinusoidal"
+Shader "Custom/VertexSinusoidal"
 {
 	// Sinusoidal vertex shader.
+	// Written in Unity 5.5.1
 	Properties
 	{
 		_MainTex("Base (RGB)", 2D) = "white" {}

@@ -1,6 +1,7 @@
-﻿Shader "Custom/TransparentGrabShader"
+Shader "Custom/TransparentGrabShader"
 {
 	// Basic glass-like grab pass shader.
+	// Written in Unity 5.5.1
 	Properties
 	{
 		_Tint("Grab Texture Tint", Color) = (1, 1, 1, 1)

@@ -1,6 +1,7 @@
 Shader "Custom/Glass"
 {
 	// Glass shader with distortion.
+	// Written in Unity 5.5.1
 	Properties
 	{
 		_MainTex("Base (RGB) Trans (A)", 2D) = "white" {}

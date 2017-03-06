@@ -1,5 +1,7 @@
-Shader "Custom/Transparent" {
+Shader "Custom/Transparent"
+{
 	// Simple glass-effect shader for textures with transparent layer mask
+	// Written in Unity 5.5.1
 	Properties
 	{
 		_Color("Color", Color) = (1,1,1,1)

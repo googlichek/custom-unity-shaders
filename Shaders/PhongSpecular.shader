@@ -1,6 +1,7 @@
 ﻿Shader "Custom/PhongSpecular"
 {
 	// Viewpoint-dependent specular shader.
+	// Written in Unity 5.5.1
 	Properties
 	{
 		_MainTint ("Diffusive Tint", Color) = (1,1,1,1)

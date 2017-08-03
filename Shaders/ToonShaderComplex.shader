@@ -3,6 +3,7 @@
 	Properties
 	{
 		_MainTex("Texture", 2D) = "white" {}
+		_OcclusionMap("Occlusion", 2D) = "white" {}
 		_BumpMap("Normal Map", 2D) = "bump" {}
 		_Color("Diffuse Color", Color) = (1,1,1,1)
 		_UnlitColor("Unlit Diffuse Color", Color) = (0.5,0.5,0.5,1)
@@ -31,13 +32,12 @@
 			LOD 300
 
 			CGPROGRAM
-			#pragma vertex vert // this specifies the vert function as the vertex shader 
-			#pragma fragment frag // this specifies the frag function as the fragment shader
+			#pragma vertex vert
+			#pragma fragment frag
 			#include "UnityCG.cginc"
 
-			//Specified properties
-
 			sampler2D _MainTex;
+			sampler2D _OcclusionMap;
 			sampler2D _BumpMap;
 			uniform float4 _LightColor0;
 			uniform float4 _Color;
@@ -54,27 +54,28 @@
 			uniform float _DiffuseReflectionPower;
 			uniform float _HighlightThreshold;
 
-			//Vertex Input Parameters
 			struct vertexInput {
-				float4 vertex : POSITION; // position (in object coordinates, i.e. local or model coordinates)
-				float3 normal : NORMAL;// surface normal vector (in object coordinates; usually normalized to unit length)
+				float4 vertex : POSITION;
 				float4 color : COLOR;
+				float3 normal : NORMAL;
+				float2 texcoord: TEXCOORD0;
 			};
 
-			//Vertex Output Parameters
 			struct vertexOutput { 
-				float4 pos : SV_POSITION; //vertex output parameter with semantic SV_POSITION (used in projection transformation for Clip Coordinates)							!
+				float4 pos : SV_POSITION;
 				fixed4 color : COLOR;
-				float4 posWorld : TEXCOORD0; // 0th set of texture coordinates (a.k.a. “UV”; between 0 and 1) 
-				float3 normalDir : TEXCOORD1; // 1st  ---||---
+				float4 posWorld : TEXCOORD0;
+				float3 normalDir : TEXCOORD1;
+				float2 texcoord : TEXCOORD2;
+				float3 normal : TEXCOORD3;
 			};
 
-			//////////// VERTEX SHADER ////////////
 			vertexOutput vert(vertexInput input) //takes the vertexInput struct as argument to ensure matching semantics (I think?)
 			{
 				vertexOutput output; //Defining the struct for the output; no need for specifying the 'struct' as this is done automatically.
 
 				output.color = input.color;
+				output.texcoord = input.texcoord;
 
 				float4x4 modelMatrix = unity_ObjectToWorld; //Define the 4x4 transformation 'modelMatrix' for defining world position.											!
 				float4x4 modelMatrixInverse = unity_WorldToObject; //Used as the inverse of the above specified; used to calculate the normal direction							!
@@ -82,19 +83,29 @@
 				output.posWorld = mul(modelMatrix, input.vertex); //Calculate the position in world space by multiplying the modelMatrix with the input vertices of the object. !
 				output.normalDir = normalize(mul(float4(input.normal, 0.0), modelMatrixInverse).xyz); //Calculate the normalized direction of the vectors of the object.		!
 				output.pos = UnityObjectToClipPos(input.vertex); //transformation of input.vertex from object coordinates to world coordinates;
+
+				output.normal = UnityObjectToWorldNormal(input.normal);
+
 				return output; //Returns final output from the struct; can only return one value.
 			}
 
 			//////////// FRAGMENT SHADER ////////////
 			float4 frag(vertexOutput input) : COLOR //Using the structure as an argument for the fragment shader to make sure the semantics match. 
 			{
+				float4 finalColor = 0;
+				float4 baseColor = tex2D(_MainTex, input.texcoord);
+				fixed occlusion = tex2D(_OcclusionMap, input.texcoord).r;
+
+				half3 normal = UnpackNormal(tex2D(_BumpMap, input.texcoord));
+
+				finalColor.rgb = normal * 0.5 + 0.5;
+				finalColor *= baseColor;
+				finalColor *= occlusion;
+
 				float3 normalDirection = normalize(input.normalDir); //Normalize the direction of the object vectors															?
-				//float3 viewDirection = normalize(_WorldSpaceCameraPos - input.posWorld.xyz); //Normalize the view direction
+				float3 viewDirection = normalize(_WorldSpaceCameraPos - input.posWorld.xyz); //Normalize the view direction
 				float3 lightDirection; //float3 for holding the vector direction of the light
 				float attenuation; //float value for holding the attenuation of light
-
-				half4 viewDirection = tex2D(_MainTex, input.posWorld);
-				//float3 normalDirection = normalize(UnpackNormal((tex2D(_BumpMap, input.normalDir)))).rgb;
 
 				//https://en.wikibooks.org/wiki/Cg_Programming/Unity/Diffuse_Reflection
 				//Caluclate Attenuation and light direction: Used to determine the decay (rate) of light and direction
@@ -151,7 +162,7 @@
 				// multiplying by a slightly lesser number on each cut. 3 cuts total.
 				if (attenuation * max(0.0, dot(normalDirection, lightDirection)) >= _DiffuseThreshold1)
 				{
-					fragmentColor = _LightColor0.rgb * _UnlitColor.rgb * _UnlitColorPower; //Set the color to the original color
+					fragmentColor = _LightColor0.rgb * _UnlitColor.rgb * _UnlitColorPower ; //Set the color to the original color
 				}
 				else if (attenuation * max(0.0, dot(normalDirection, lightDirection)) >= _DiffuseThreshold2)
 				{
@@ -205,10 +216,12 @@
 					fragmentColor = _LightColor0.rgb * (_OutlineColor.rgb - specularReflection - diffuseReflection - ambientLighting);
 				}
 
+				finalColor *= float4(fragmentColor + diffuseReflection + ambientLighting, 1.0);
+
 				//Finally we return the color based on the struct. Before returning the final result, we add the diffuseReflection and ambientlight
 				//(if an ambient light exists) to calculate the final color of the pixel occupying the object with the shader script attached.
 				//Also we add multiply color and main texture.
-				return float4(fragmentColor + diffuseReflection + ambientLighting, 1.0);
+				return finalColor;
 			}
 
 			ENDCG

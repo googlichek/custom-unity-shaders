@@ -1,10 +1,14 @@
-﻿Shader "Custom/ToonShaderComplex"
+﻿// Vertex Fragment Toon Shader.
+// Written in Unity 2017.1.
+Shader "Custom/ToonShaderComplex"
 {
 	Properties
 	{
 		_MainTex("Texture", 2D) = "white" {}
 		_OcclusionMap("Occlusion", 2D) = "white" {}
 		_BumpMap("Normal Map", 2D) = "bump" {}
+		_BumpMapMultiplier("Normal Map Multiplier", Range(0, 1)) = 0.5
+		_BumpMapModifier("Normal Map Modifier", Range(0, 1)) = 0.5
 		_Color("Diffuse Color", Color) = (1,1,1,1)
 		_UnlitColor("Unlit Diffuse Color", Color) = (0.5,0.5,0.5,1)
 		_UnlitColorPower("Strength of Unlit", Range(0.1,2)) = 1
@@ -29,7 +33,7 @@
 			ZWrite On
 			Lighting Off
 			Fog{ Mode Off }
-			LOD 300
+			LOD 100
 
 			CGPROGRAM
 			#pragma vertex vert
@@ -53,6 +57,8 @@
 			uniform float _SpecReflectionPower;
 			uniform float _DiffuseReflectionPower;
 			uniform float _HighlightThreshold;
+			uniform float _BumpMapMultiplier;
+			uniform float _BumpMapModifier;
 
 			struct vertexInput {
 				float4 vertex : POSITION;
@@ -98,7 +104,7 @@
 
 				half3 normal = UnpackNormal(tex2D(_BumpMap, input.texcoord));
 
-				finalColor.rgb = normal * 0.5 + 0.5;
+				finalColor.rgb = normal * _BumpMapMultiplier + _BumpMapModifier;
 				finalColor *= baseColor;
 				finalColor *= occlusion;
 
